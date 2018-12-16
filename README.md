@@ -34,14 +34,16 @@
    ESC : Slam  
 
  player 1
-   A move left
-   S move right
-   F flap wings
+ 
+   A  move left
+   S  move right
+   F  flap wings
    
  player 2
-   . move left
-   / move right
-   UP arrow flap wings
+ 
+   .  move left
+   /  move right
+   UP arrow  flap wings
 
 
  Joystick support.

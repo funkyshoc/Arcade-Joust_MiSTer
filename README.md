@@ -2,25 +2,25 @@
 -- Arcade: Joust port to MiSTer by Sorgelig, oldgit
 -- December 2018
 
----------------------------------------------------------------------------------
+
  gen_ram.vhd
--------------------------------- 
+
  Copyright 2005-2008 by Peter Wendrich (pwsoft@syntiac.com)
  http://www.syntiac.com/fpga64.html
----------------------------------------------------------------------------------
+
  cpu09l - Version : 0128
  Synthesizable 6809 instruction compatible VHDL CPU core
  Copyright (C) 2003 - 2010 John Kent
----------------------------------------------------------------------------------
+
  cpu68 - Version 9th Jan 2004 0.8
  6800/01 compatible CPU core 
  GNU public license - December 2002 : John E. Kent
----------------------------------------------------------------------------------
---
--- This port is only possible because of previous work by many many others - Thank You
--- to find out more search "Williams arcade" on a search engine.  
--- 
--- 
+
+
+ This port is only possible because of previous work by many many others - Thank You
+ to find out more search "Williams arcade" on a search engine.  
+
+ 
  Keyboard players inputs :
 
    F10 : Advance
@@ -32,20 +32,21 @@
    F2  : Start 2 players
    F1  : Start 1 player
    ESC : Slam  
---
--- player 1
+
+ player 1
    A move left
    S move right
    F flap wings
--- player 2
+   
+ player 2
    . move left
    / move right
    UP arrow flap wings
---
---
--- Joystick support.
--- 
--- 
+
+
+ Joystick support.
+ 
+ 
 ---------------------------------------------------------------------------------
 
                                 *** Attention ***

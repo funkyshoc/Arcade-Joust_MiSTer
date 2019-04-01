@@ -21,6 +21,7 @@
 ---------------------------------------------------------------------------------
 -- Dec 2018 DW
 -- change name to williams for easier porting. changes to sound selection and speech input for later williams boards.
+-- Apr 2019 change clock speeds as board running too fast
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -30,18 +31,19 @@ use ieee.numeric_std.all;
 entity williams_sound_board is
 port(
 	clk_sys      : in std_logic;
-	clk_1p79     : in std_logic;
-	clk_0p89     : in std_logic;
+	clk_snd2     : in std_logic;
+	clk_snd1     : in std_logic;
 	reset        : in std_logic;
+	test_sw_l		: in std_logic := '1'; -- Test switch
+	ds1_1				: in std_logic := '1'; -- Configuration switch 1, these are not used by all games
+	ds1_2				: in std_logic := '1'; -- Configuration switch 2
 	hand			 : in std_logic;
 	dn_addr      : in  std_logic_vector(15 downto 0);
 	dn_data      : in  std_logic_vector(7 downto 0);
 	dn_wr        : in  std_logic;
 
 	select_sound : in std_logic_vector(5 downto 0);
-	audio_o	    : out std_logic_vector( 7 downto 0);
-
-	dbg_cpu_addr : out std_logic_vector(15 downto 0)
+	audio_o	    : out std_logic_vector( 7 downto 0)
 );
 end williams_sound_board;
 
@@ -72,18 +74,15 @@ architecture struct of williams_sound_board is
 	signal pia_cb1_i  : std_logic;
 	signal speech_clk      : std_logic;
 	signal speech_data     : std_logic;
-	signal pia_cb2_i    : std_logic;
-	signal pia_ca2_i    : std_logic;
-
+	signal cpu_nmi     : std_logic;
+	signal vma    : std_logic;
+	
 begin
 
-	speech_clk <= '0';
-	speech_data <= '0';
-	
-dbg_cpu_addr <= cpu_addr;
+cpu_nmi <= (not test_sw_l);
 
--- cpu_clock is 3.58/4
-cpu_clock <= clk_0p89;
+-- cpu_clock 
+cpu_clock <= clk_snd1;
 
 -- pia cs
 wram_cs <= '1' when cpu_addr(15 downto  8) = X"00" else '0';                       -- 0000-007F
@@ -106,14 +105,14 @@ port map(
 	clk      => cpu_clock,-- E clock input (falling edge)
 	rst      => reset,    -- reset input (active high)
 	rw       => cpu_rw,   -- read not write output
-	vma      => open,     -- valid memory address (active high)
+	vma      => vma,      -- valid memory address (active high)
 	address  => cpu_addr, -- address bus output
 	data_in  => cpu_di,   -- data bus input
 	data_out => cpu_do,   -- data bus output
 	hold     => '0',      -- hold input (active high) extend bus cycle
 	halt     => '0',      -- halt input (active high) grants DMA
 	irq      => cpu_irq,  -- interrupt request input (active high)
-	nmi      => '0',      -- non maskable interrupt request input (active high)
+	nmi      => cpu_nmi,  -- non maskable interrupt request input (active high)
 	test_alu => open,
 	test_cc  => open
 );
@@ -129,7 +128,7 @@ port map
 	address_a => dn_addr(11 downto 0),
 	data_a    => dn_data,
 
-	clock_b   => clk_1p79,
+	clock_b   => clk_snd2,
 	address_b => cpu_addr(11 downto 0),
 	q_b       => rom_do
 );
@@ -138,7 +137,7 @@ port map
 cpu_ram : entity work.gen_ram
 generic map( dWidth => 8, aWidth => 7)
 port map(
-	clk  => clk_1p79,  -- 3p58/2
+	clk  => clk_snd2,  -- 3p58/2
 	we   => wram_we,
 	addr => cpu_addr(6 downto 0),
 	d    => cpu_do,
@@ -148,23 +147,21 @@ port map(
 -- pia I/O
 audio_o <= pia_pa_o;
 
-pia_pb_i <= "00" & select_sound(5 downto 0);
+pia_pb_i <= hand & ds1_1 & select_sound(5 downto 0);
 
 -- pia Cb1
---pia_cb1_i <= '0' when select_sound = "111111" else '1';
 pia_cb1_i <= not (hand and select_sound(5) and select_sound(4) and select_sound(3) and select_sound(2) and select_sound(1) and select_sound(0));
 
 -- pia irqs to cpu
 cpu_irq  <= pia_irqa or pia_irqb;
-pia_cb2_i <= speech_clk;
-pia_ca2_i <= speech_data;
+
 
 -- pia 
 pia : entity work.pia6821
 port map
 (	
-	clk_p      	=> clk_1p79,
-	clk_n      	=> not clk_1p79,
+	clk_p      	=> clk_snd2,
+	clk_n      	=> not clk_snd2,
 	rst       	=> reset,
 	cs        	=> pia_cs,
 	rw        	=> pia_rw_n,
@@ -173,13 +170,28 @@ port map
 	data_out  	=> pia_do,
 	irqa      	=> pia_irqa,
 	irqb      	=> pia_irqb,
-	pa_i      	=> (others => '0'),
+	pa_i      	=> x"FF", 
 	pa_o        => pia_pa_o,
 	ca1       	=> '1',
-	ca2_i      	=> pia_ca2_i,
+	ca2_i      	=> '1',
+	ca2_o			=> speech_data,
 	pb_i      	=> pia_pb_i,
 	cb1       	=> pia_cb1_i,
-	cb2_i      	=> pia_cb2_i
+	cb2_i      	=> '0',
+	cb2_o			=> speech_clk
 );
+
+
+-- CVSD speech decoder	
+--IC1: entity work.HC55564	
+--port map(	
+--	clk => speech_clk,
+--	rst => '0', -- Reset is not currently implemented
+--	bit_in => speech_data,
+--	sample_out(15 downto 0) => speech_out
+
+--	);
+
+
 
 end struct;

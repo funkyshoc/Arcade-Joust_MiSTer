@@ -35,8 +35,8 @@ entity williams_cpu is
 port(
 	clk_sys			  	: in		std_logic;
 	CLK12            	: in    	std_logic;
-	clk_1p79         	: in    	std_logic;
-	clk_0p89         	: in    	std_logic;
+	clk_snd2         	: in    	std_logic;
+	clk_snd1         	: in    	std_logic;
 
 	I_RESET		     	: in		std_logic;	-- active high reset
 
@@ -855,8 +855,8 @@ port map
 	audio: entity work.williams_sound_board
 	port map(
 		clk_sys 		=> clk_sys,
-		clk_1p79 	=> clk_1p79,
-		clk_0p89 	=> clk_0p89,        
+		clk_snd2 	=> clk_snd2,
+		clk_snd1 	=> clk_snd1,        
 		reset 		=> reset,
 		hand 			=> PB(6),
 		dn_addr 		=> dn_addr,       

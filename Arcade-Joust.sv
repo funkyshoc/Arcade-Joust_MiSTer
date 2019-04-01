@@ -100,8 +100,8 @@ localparam CONF_STR = {
 ////////////////////   CLOCKS   ///////////////////
 
 wire clk_sys, clk_12;
-wire clk_1p79;
-wire clk_0p89;
+wire clk_snd2;
+wire clk_snd1;
 
 pll pll
 (
@@ -109,8 +109,8 @@ pll pll
 	.rst(0),
 	.outclk_0(clk_sys),
 	.outclk_1(clk_12),
-	.outclk_2(clk_1p79),
-	.outclk_3(clk_0p89)
+	.outclk_2(clk_snd2),
+	.outclk_3(clk_snd1)
 );
 
 
@@ -253,8 +253,8 @@ williams_cpu williams_cpu
 (
 	.clk_sys(clk_sys),
 	.CLK12(clk_12),
-	.clk_1p79(clk_1p79),
-	.clk_0p89(clk_0p89),
+	.clk_snd2(clk_snd2),
+	.clk_snd1(clk_snd1),
 
 	.I_RESET(RESET | status[0] | buttons[1] | ioctl_download),
 

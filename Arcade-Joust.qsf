@@ -370,7 +370,7 @@ set_global_assignment -name CDF_FILE jtag.cdf
 set_global_assignment -name QIP_FILE sys/sys.qip
 set_global_assignment -name VHDL_FILE dpram.vhd
 set_global_assignment -name VHDL_FILE gen_ram.vhd
-set_global_assignment -name VHDL_FILE Joust_cmos_ram.vhd
+set_global_assignment -name VHDL_FILE joust_cmos_ram.vhd
 set_global_assignment -name VHDL_FILE williams_rom.vhd
 set_global_assignment -name VHDL_FILE williams_ram.vhd
 set_global_assignment -name VHDL_FILE pia6821.vhd
